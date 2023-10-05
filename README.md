@@ -98,7 +98,7 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 
 Pull requests are welcome! Please ensure that any changes or additions you make are well-documented and covered by test cases.
 
-For any bugs or issues, please open an [issue](/PeterMcQuaid/EtherGuard/issues).
+For any bugs or issues, please open an [issue](https://github.com/PeterMcQuaid/EtherGuard/issues).
 
   
 ## License

@@ -1,7 +1,7 @@
 # EtherGuard
 > A secure and efficient EVM-based wallet
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](LINK_TO_YOUR_BUILD) [![Python Version](https://img.shields.io/badge/python-3.7-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() 
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yml/badge.svg) [![Python Version](https://img.shields.io/badge/python-3.7-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() 
 
 ## Table of Contents
 
@@ -36,6 +36,7 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 ## Project Layout
 ```
 ├── README.md
+├── LICENSE
 ├── Tests
 │   ├── __init__.py
 │   └── test_wallet.py
@@ -45,7 +46,6 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 ├── env.example
 ├── requirements.txt
 └── logs
-
 ```
 
 ## Prerequisites
@@ -56,7 +56,8 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/PeterMcQuaid/YOUR_REPOSITORY.git
+   git clone https://github.com/PeterMcQuaid/EtherGuard.git
+   ```
    
 2. Navigate to project directory
    ```
@@ -65,6 +66,7 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 3. Install requirements
     ```
    pip install -r requirements.txt
+   ```
 
 ## Usage
 
@@ -79,6 +81,7 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 2. Create a signed transaction
     ```
     python ./Wallet/evm_wallet.py
+    ```
     
 ## Testing
     
@@ -95,7 +98,7 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 
 Pull requests are welcome! Please ensure that any changes or additions you make are well-documented and covered by test cases.
 
-For any bugs or issues, please open an [issue](/issues).
+For any bugs or issues, please open an [issue](/PeterMcQuaid/EtherGuard/issues).
 
   
 ## License

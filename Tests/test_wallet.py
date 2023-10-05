@@ -8,7 +8,7 @@ class TestWallet(unittest.TestCase):
 
 	def test_checksum_address(self):
 
-		self.assertEqual(evm_wallet.checksum_address("abe8bb8ca3f5651220c9313cd4440e4805afdf04"), "abe8bB8CA3F5651220c9313Cd4440E4805AfDf04")
+		self.assertEqual(evm_wallet.checksum_address("bbe8bb8ca3f5651220c9313cd4440e4805afdf04"), "abe8bB8CA3F5651220c9313Cd4440E4805AfDf04")
 		self.assertEqual(evm_wallet.checksum_address("4598d8ef230f659d435c04a0c087e23ceec0e88b"), "4598D8EF230f659D435C04a0c087e23ceEC0E88b")
 		self.assertEqual(evm_wallet.checksum_address("310f8727dd91502e3f4486084fa5c62ca0099cb4"), "310F8727DD91502E3F4486084fa5C62CA0099cB4")
 

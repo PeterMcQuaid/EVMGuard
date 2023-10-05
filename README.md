@@ -1,7 +1,9 @@
 # EtherGuard
 > A secure and efficient EVM-based wallet
 
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml/badge.svg) [![Python Version](https://img.shields.io/badge/python-3.7-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() 
+[![Python Unit Tests](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml/badge.svg)](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml) [![Python Version](https://img.shields.io/badge/python-3.7-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() 
+
+
 
 ## Table of Contents
 

@@ -84,6 +84,11 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
     ```
     python ./Wallet/evm_wallet.py
     ```
+
+3. Sign an arbitrary message
+    ```
+    python ./Wallet/evm_wallet.py signMessage "arbitrary message"
+    ```
     
 ## Testing
     

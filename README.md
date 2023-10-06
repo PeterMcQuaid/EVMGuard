@@ -20,7 +20,7 @@
 
 ## Introduction
 
-EtherGuard is a Python-based EVM wallet with arbitrary message signing functionality built-in. EtherGuard creates raw transactions that can be sent to any EVM-compatible chain, via a node's JSON-RPC API
+EtherGuard is a Python-based EVM wallet with arbitrary message signing functionality. EtherGuard creates raw transactions that can be sent to any EVM-compatible chain, via a node's JSON-RPC API
 
 EtherGuard supports all three transaction types across EVM-chains, and has full support for custom access lists
 

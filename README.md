@@ -7,7 +7,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/PeterMcQuaid/EtherGuard">
+  <a href="https://github.com/PeterMcQuaid/EtherGuard/images">
     <img src="images/logo.JPG" alt="Logo" width="80" height="80">
   </a>
 

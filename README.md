@@ -1,5 +1,4 @@
-# EtherGuard
-> A secure and efficient EVM-based wallet
+<a name="readme-top"></a>
 
 [![Unit Tests](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml/badge.svg)](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml) [![Python Version](https://img.shields.io/badge/python-3.7-blue)](https://www.python.org/downloads/release/python-370/) [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE) 
 
@@ -8,7 +7,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/PeterMcQuaid/EtherGuard/images">
-    <img src="images/logo.JPG" alt="Logo" width="80" height="80">
+    <img src="https://raw.githubusercontent.com/PeterMcQuaid/EtherGuard/main/images/logo.JPG" alt="Logo" width=500>
   </a>
 
   <h3 align="center">EtherGuard</h3>
@@ -16,18 +15,16 @@
   <p align="center">
     A secure and efficient EVM-based wallet
     <br />
-    <a href="https://github.com/PeterMcQuaid/EtherGuard"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/PeterMcQuaid/EtherGuard#installation"><strong>Setup & Installation »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/PeterMcQuaid/EtherGuard">View Demo</a>
+    <a href="https://github.com/PeterMcQuaid/EtherGuard#contributions">Contribute to EtherGuard</a>
     ·
     <a href="https://github.com/PeterMcQuaid/EtherGuard/issues">Report Bug</a>
     ·
     <a href="https://github.com/PeterMcQuaid/EtherGuard/issues">Request Feature</a>
   </p>
 </div>
-
-
 
 
 ## Table of Contents

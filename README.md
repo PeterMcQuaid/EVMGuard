@@ -4,6 +4,31 @@
 [![Unit Tests](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml/badge.svg)](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml) [![Python Version](https://img.shields.io/badge/python-3.7-blue)](https://www.python.org/downloads/release/python-370/) [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE) 
 
 
+<!-- PROJECT LOGO -->
+<br />
+<div align="center">
+  <a href="https://github.com/PeterMcQuaid/EtherGuard">
+    <img src="images/logo.JPG" alt="Logo" width="80" height="80">
+  </a>
+
+  <h3 align="center">EtherGuard</h3>
+
+  <p align="center">
+    A secure and efficient EVM-based wallet
+    <br />
+    <a href="https://github.com/PeterMcQuaid/EtherGuard"><strong>Explore the docs »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/PeterMcQuaid/EtherGuard">View Demo</a>
+    ·
+    <a href="https://github.com/PeterMcQuaid/EtherGuard/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/PeterMcQuaid/EtherGuard/issues">Request Feature</a>
+  </p>
+</div>
+
+
+
 
 ## Table of Contents
 

@@ -46,7 +46,7 @@ EtherGuard is a Python-based EVM wallet with arbitrary message signing functiona
 
 EtherGuard supports all three transaction types across EVM-chains, and has full support for custom access lists
 
-EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the ECDSA signature geneated
+EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the ECDSA signature generated
 
 ## Features
 

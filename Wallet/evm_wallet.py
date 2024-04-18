@@ -6,6 +6,7 @@ import secrets
 import logging
 import os
 from pathlib import Path
+import ckzg
 
 Pcurve = 2**256 - 2**32 - 2**9 - 2**8 - 2**7 - 2**6 - 2**4 -1 
 N=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141 
@@ -200,7 +201,7 @@ def generate_signature(privKey, xPub, yPub, msg_hash, signature_verification, pu
 
 '''
 RLP encodes list or payload, but assumes if list passed, it is already RLP encoded, e.g. for 
-list ["hello", "world"], this function assumes already in format: '8568656c6c6f85776f726c64'
+list ["hello", "world"], this function assumes already in format: '8568656c6c6f85776f726c64', i.e. input is string representation of a list
 Function assumes length of list in hex digits is even
 '''
 def rlp_encode_list(input_value):
@@ -217,7 +218,7 @@ def rlp_encode_list(input_value):
             hex_len_bytes = "0" + hex_len_bytes
         input_value = hex(247 + int(len(hex_len_bytes)/2))[2:] + hex_len_bytes + input_value
 
-    return input_value
+    return input_value  # Returning string representation of a list
 
 
 '''
@@ -292,6 +293,119 @@ def rlp_encode_access_list(access_list):
     accessList = rlp_encode_list(access_string)
 
     return accessList
+
+
+'''
+Adds a leading zero to the blob data every 32 bytes to avoid data corruption through BLS_MODULUS
+Note - If blob data already close to max then adding zeros will exceed the limit, so we need to trim it
+'''
+def encodeLeadingZeros(blob):
+    # Number of hex characters representing 31 bytes (since one byte will be "00")
+    interval = 62
+    
+    # Initialize the result, starting with "00"
+    blob_string = "00"
+    
+    # Iterate over each block of the blob, adding "00" every 32 bytes
+    for i in range(0, len(blob), interval):
+        # Add the next 62 characters and then a "00"
+        blob_string += blob[i:i+interval] + "00"
+    
+    # If the blob is too long after adding zeros, trim it to the maximum allowed length
+    if len(blob_string) / 2 > 131072:
+        blob_string = blob_string[:131072*2]
+    
+    return blob_string
+
+
+'''
+Reverse of encoding process, removes the leading zeros added every 32 bytes. Adds zeros back to the blob data
+given that it is removing data from correct blob size
+'''
+def decodeLeadingZeros(blob):
+    # Remove the "00" added every 32 bytes (which is every 64 hex characters plus 2 for "00")
+    interval = 64
+    chunks = [blob[i+2:i+interval] for i in range(0, len(blob), interval)]
+    
+    # Join all chunks without the "00"
+    blob_string = "".join(chunks)
+
+    # If the blob is too short after removing zeros, trim it to the maximum allowed length
+    if len(blob_string) / 2 < 131072:
+        blob_string += "00" * (131072 - int(len(blob_string)/2))
+    
+    return blob_string
+
+
+'''
+The blob data 32 byte chunks all need to be scaled by the BLS_MODULUS, otherwise the KZG commitment generation will fail
+'''
+def blsModBlob(blob):
+    BLS_MODULUS = 52435875175126190479447740508185965837690552500527637822603658699938581184513
+    blob_array = []
+
+    for i in range(0, 4096):
+        value = int(blob[i*64:(i+1)*64], 16)
+        value = value % BLS_MODULUS
+        hex_value = hex(value)[2:]
+        if len(hex_value) < 64:
+            while len(hex_value) < 64:
+                hex_value = "0" + hex_value
+        blob_array.append(hex_value)
+
+    blob_string = "".join(blob_array)
+    print(len(blob_string)/2)
+
+    return blob_string
+
+
+'''
+Function reads a file of blob data, hashes each blob, generates KZG commitment and proof for each blob, returning the 
+versioned hash, blob data and KZG proof for each blob. Each list element is RLP-encoded but the list RLP-encoding doesn't take place here
+'''
+def getKZGBlobCommits(blob_versioned_hashes, blobs, commitments, proofs):
+    BLOB_DATA_SIZE = 131072     # Current size of each blob in bytes
+
+    trusted_setup_path = "./externals/c-kzg-4844/src/trusted_setup.txt" # Running from project root
+    trusted_setup = ckzg.load_trusted_setup(trusted_setup_path)     # Loading trusted setup from KZG ceremony
+    with open("./Wallet/blob_data.txt", 'r', encoding='utf-8') as file:    # Loading blob data from file (sum of all blobs concat in a single file)
+        file_contents = file.read()
+    
+    file_data_length = int(len(file_contents)/2)
+    num_blobs = int(file_data_length/BLOB_DATA_SIZE) + 1
+
+    for i in range(num_blobs):
+        blob = file_contents[i*BLOB_DATA_SIZE*2:(i+1)*BLOB_DATA_SIZE*2]
+        blob_size = int(len(blob)/2)
+
+        if blob_size < BLOB_DATA_SIZE:
+            blob += "00"*(BLOB_DATA_SIZE - blob_size)  # Right padding with zeros to make the blob size equal to 131072 byte
+        
+        blob = encodeLeadingZeros(blob)     # Encoding leading zeros in the blob dat
+        #blob = blsModBlob(blob)         # Modifying the blob data to be within the BLS modulus
+        blob_data_bytes = bytes.fromhex(blob)     # Converting the blob data to bytes
+        kzg_commitment = ckzg.blob_to_kzg_commitment(blob_data_bytes, trusted_setup)
+        
+        kzg_proof = ckzg.compute_blob_kzg_proof(blob_data_bytes, kzg_commitment, trusted_setup)
+        verified = ckzg.verify_blob_kzg_proof(blob_data_bytes, kzg_commitment, kzg_proof, trusted_setup)
+        if not verified:
+            raise Exception("KZG proof verification failed")
+        
+        hash_obj = hashlib.sha256()     # Hashing the blob data
+        hash_obj.update(kzg_commitment)
+        versioned_hash = "01" + hash_obj.hexdigest()[2:]
+
+        if len(kzg_commitment.hex())/2 != 48:
+            raise Exception("KZG commitment length is not 48 bytes")
+        if len(kzg_proof.hex())/2 != 48:
+            raise Exception("KZG proof length is not 48 bytes")
+
+        commitments += rlp_encode_string(kzg_commitment.hex())
+        blobs += rlp_encode_string(blob)
+        proofs += rlp_encode_string(kzg_proof.hex())
+        blob_versioned_hashes += rlp_encode_string(versioned_hash)
+
+    return blob_versioned_hashes, blobs, commitments, proofs
 
 
 '''
@@ -388,6 +502,50 @@ def type_2(priv_key, xPub, yPub, accessList, *args, signature_verification, pubk
     return raw_tx
 
 
+'''
+Final tx format:
+0x03 || rlp([chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, to, value, data, access_list, max_fee_per_blob_gas, blob_versioned_hashes, y_parity, r, s])
+Signing:
+keccak256(0x03 || rlp([chain_id, nonce, max_priority_fee_per_gas, max_fee_per_gas, gas_limit, to, value, data, access_list, max_fee_per_blob_gas, blob_versioned_hashes]))
+Overall blob wrapper:
+rlp([tx_payload_body, blobs, commitments, proofs])
+Final tx format: 0x03 || rlp([tx_payload_body, blobs, commitments, proofs])
+'''
+def type_3(priv_key, xPub, yPub, max_fee_per_blob_gas, accessList, *args, signature_verification, pubkey_recov):
+
+    tx_format = ""
+
+    for arg in args:
+        tx_format += rlp_encode_string(arg)
+
+    tx_format += rlp_encode_access_list(accessList)
+    tx_format += rlp_encode_string(max_fee_per_blob_gas)
+
+    # Data for wrapped transaction payload
+    blob_versioned_hashes, blobs, commitments, proofs = "", "", "", ""     # Note the 'rlp_encode_list' takes in a string, so using a string representation of a list is more convenient
+    (blob_versioned_hashes, blobs, commitments, proofs) = getKZGBlobCommits(blob_versioned_hashes, blobs, commitments, proofs)
+    tx_format += rlp_encode_list(blob_versioned_hashes)
+
+    raw_unsigned_msg = "03" + rlp_encode_list(tx_format)
+    msg_hash = keccak(bytes.fromhex(raw_unsigned_msg)).hex()
+    HashOfThingToSign = int(msg_hash, 16)
+
+    # chainID, nonce, gasPriority, gasPrice, gasLimit, to, value, data
+
+    yparity, r, s = generate_signature(priv_key, xPub, yPub, HashOfThingToSign, signature_verification, pubkey_recover)
+
+    if yparity == "00":
+        yparity = "80" #actually correct format for yparity of 0
+
+    tx_payload_body = rlp_encode_list(tx_format + yparity + rlp_encode_string(r) + rlp_encode_string(s)).lower()
+
+    tx_hash = keccak(bytes.fromhex("03" + tx_payload_body)).hex()
+
+    final_tx = "03" + rlp_encode_list(tx_payload_body + rlp_encode_list(blobs) + rlp_encode_list(commitments) + rlp_encode_list(proofs))
+
+    return final_tx, tx_hash
+
+
 def contract_creation_address(address, nonce):
 
     contract_address = keccak(bytes.fromhex(rlp_encode_list(rlp_encode_string(address)+rlp_encode_string(nonce)))).hex()[24:]
@@ -404,16 +562,18 @@ def contract_creation_2_address():
 
 
 def main(arg1=None, arg2=None):
-
     privKey = os.environ.get('PRIVATE_KEY')
-    nonce = 0
-    gasPriority = "59682f00" #0x59682f00 == 1.5 Gwei #max priority fee
-    gasPrice = "4a817c800" # 0xb2d05e00 == 3 Gwei
+    nonce = 3
+    gasPriority = "989680" #0x59682f00 == 1.5 Gwei #max priority fee, 0x989680 == 0.01 Gwei
+    gasPrice = "03ba453680" # 0x0147d35700 == 5.5 Gwei
     gasLimit = "5208" # 0x5208 == 21000
-    to = "" #remove "0x"
+    to = "75cBaBf6ef1DD426eCF70458841127007d0cfef8" #remove "0x"
     value = 0  #ether value to send
     data = 0 #transaction calldata to pass
-    chainID = 11155111
+    chainID = 1
+
+    # EIP4844
+    max_fee_per_blob_gas = "01"
 
     accessList = []#[["a0a24360cE64d364C0afB4325B6b70c66fDA24cd", ["0000000000000000000000000000000000000000000000000000000000000003", "0000000000000000000000000000000000000000000000000000000000000069"]]]#[["a0a24360cE64d364C0afB4325B6b70c66fDA24cd", ["0000000000000000000000000000000000000000000000000000000000000003", "0000000000000000000000000000000000000000000000000000000000000069"]],["a31df417ab346e0c45955e3e30e998defe9efe74", ["00000000000000000000000000000000000000000000000000000000000000fe", "0000000000000000000000000000000000000000000000000000000000000000"]]]
 
@@ -449,12 +609,14 @@ def main(arg1=None, arg2=None):
         '''raw_tx = type_1(privKey, xPub, yPub, accessList,   
                             chainID, nonce, gasPrice, gasLimit, to, value, data, 
                             signature_verification=True, pubkey_recov=True)'''
-
-        raw_tx = type_2(privKey, xPub, yPub, accessList,   
+        '''raw_tx = type_2(privKey, xPub, yPub, accessList,   
                             chainID, nonce, gasPriority, gasPrice, gasLimit, to, value, data, 
-                            signature_verification=True, pubkey_recov=True)
+                            signature_verification=True, pubkey_recov=True)'''
+        raw_tx, tx_hash = type_3(privKey, xPub, yPub, max_fee_per_blob_gas, accessList,   
+                    chainID, nonce, gasPriority, gasPrice, gasLimit, to, value, data, 
+                    signature_verification=True, pubkey_recov=True)
         print("Raw transaction: 0x{}".format(raw_tx))
-        print("Tx hash: 0x{}".format(keccak(bytes.fromhex(raw_tx)).hex()))
+        print("Tx hash: 0x{}".format(tx_hash))
         logging.info("Transaction from: 0x{} to 0x{} for {} Ether on chain {}".format(address_public, to, value, chainID))
         if to == 0:
             contract_creation_address(address_public, nonce)

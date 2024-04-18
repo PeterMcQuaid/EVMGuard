@@ -1,13 +1,13 @@
 <a name="readme-top"></a>
 
-[![Unit Tests](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml/badge.svg)](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml) [![Python Version](https://img.shields.io/badge/python-3.7-blue)](https://www.python.org/downloads/release/python-370/) [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE) 
+[![Unit Tests](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml/badge.svg)](https://github.com/PeterMcQuaid/EtherGuard/actions/workflows/build.yaml) [![Python Version](https://img.shields.io/badge/python-3.8-blue)](https://www.python.org/downloads/release/python-3815/) [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE) 
 
 
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/PeterMcQuaid/EtherGuard/images">
-    <img src="https://raw.githubusercontent.com/PeterMcQuaid/EtherGuard/main/images/logo.JPG" alt="Logo" width=500>
+    <img src="https://raw.githubusercontent.com/PeterMcQuaid/EtherGuard/main/images/logoBlobs.JPG" alt="Logo" width=500>
   </a>
 
   <h3 align="center">EtherGuard</h3>
@@ -50,6 +50,7 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 
 ## Features
 
+- Now supports EIP-4844 blob transactions
 - EVM wallet
 - Supports all transaction types
 - Supports all EVM-chains
@@ -59,30 +60,34 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 
 ## Project Layout
 ```
-├── README.md
 ├── LICENSE
+├── README.md
 ├── Tests
 │   ├── __init__.py
 │   └── test_wallet.py
 ├── Wallet
 │   ├── TonelliShanks.py
+│   ├── blob_data.txt
 │   └── evm_wallet.py
-├── env.example
-├── requirements.txt
-└── logs
+├── externals
+│   └── c-kzg-4844
+├── images
+│   ├── logo.JPG
+│   └── logoBlobs.jpg
+├── logs
+└── requirements.txt
 ```
 
 ## Prerequisites
 
-- Python 3.7+
+- Python 3.8+
 
 ## Installation
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/PeterMcQuaid/EtherGuard.git
+   git clone --recurse-submodules https://github.com/PeterMcQuaid/EtherGuard.git
    ```
-   
 2. Navigate to project directory
    ```
    cd EtherGuard
@@ -90,6 +95,15 @@ EtherGuard uses the Tonelli-Shanks algorithm for public key recovery from the EC
 3. Install requirements
     ```
    pip install -r requirements.txt
+   ```
+4. Build the C-KZG-4844 Python bindings:
+   ```
+   cd EtherGuard/externals/c-kzg-4844/bindings/python/
+   make
+   ```
+5. Append PYTHON_PATH if necessary:
+   ```
+   export PYTHONPATH="${PYTHONPATH}:/path/to/your/project/submodule/python_bindings"
    ```
 
 ## Usage

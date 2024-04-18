@@ -28,7 +28,7 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run make
-        run: |
+      run: |
           cd externals/c-kzg-4844/bindings/python && make
           cd ../../../../
       

@@ -7,7 +7,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/PeterMcQuaid/EtherGuard/images">
-    <img src="https://raw.githubusercontent.com/PeterMcQuaid/EtherGuard/main/images/logoBlobs.JPG" alt="Logo" width=500>
+    <img src="https://raw.githubusercontent.com/PeterMcQuaid/EtherGuard/main/images/logoBlobs.jpg" alt="Logo" width=500>
   </a>
 
   <h3 align="center">EtherGuard</h3>

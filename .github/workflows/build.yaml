@@ -29,6 +29,8 @@ jobs:
 
     - name: Run make
       run: |
+          pwd
+          git submodule update --init --recursive
           cd externals/c-kzg-4844/bindings/python && make
           cd ../../../../
       
